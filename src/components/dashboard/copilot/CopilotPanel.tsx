@@ -16,9 +16,9 @@ function nextId() {
   return `panel-msg-${idCounter}`;
 }
 
-function generateAssistantReply(question: string) {
+function generateAssistantReply(question: string, forceWidget: boolean) {
   const lower = question.toLowerCase();
-  const showsWidget = lower.includes("machine") || lower.includes("oee");
+  const showsWidget = forceWidget || lower.includes("machine") || lower.includes("oee");
   const text = showsWidget
     ? "Line 3's HPLC-04 unit is the biggest drag on fleet OEE today — availability dropped after an unplanned changeover. Here's the sample throughput trend against its usual baseline instrument:"
     : "Based on the last 7 days of sensor and batch data, the biggest active risk is a stability-sample deviation trending upward on Conveyor B. I'd recommend reviewing the calibration log before the next shift change.";
@@ -78,6 +78,7 @@ export function CopilotPanel({ open, onClose }: { open: boolean; onClose: () => 
   const pinnedTopRef = useRef(0);
   const messageNodeRefs = useRef(new Map<string, HTMLDivElement>());
   const lastUserIdRef = useRef<string | null>(null);
+  const userMessageCountRef = useRef(0);
 
   useEffect(() => {
     const id = lastUserIdRef.current;
@@ -102,6 +103,8 @@ export function CopilotPanel({ open, onClose }: { open: boolean; onClose: () => 
     const userId = nextId();
     const assistantId = nextId();
     lastUserIdRef.current = userId;
+    userMessageCountRef.current += 1;
+    const forceWidget = userMessageCountRef.current >= 2;
 
     setMessages((prev) => [
       ...prev,
@@ -111,7 +114,7 @@ export function CopilotPanel({ open, onClose }: { open: boolean; onClose: () => 
     setStreamingId(assistantId);
 
     timeoutRef.current = setTimeout(() => {
-      const reply = generateAssistantReply(text);
+      const reply = generateAssistantReply(text, forceWidget);
       setMessages((prev) =>
         prev.map((m) =>
           m.id === assistantId

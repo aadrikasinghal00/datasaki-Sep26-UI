@@ -1,4 +1,4 @@
-import { CopilotIcon } from "./CopilotIcon";
+import Image from "next/image";
 
 const SUGGESTIONS = [
   "What's the biggest production risk right now?",
@@ -10,7 +10,9 @@ export function ChatEmptyState({ onPick }: { onPick: (text: string) => void }) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-[32px] px-[16px] py-[24px]">
       <div className="flex flex-col items-center gap-[16px]">
-        <CopilotIcon size={40} radius={10} />
+        <div className="flex items-center justify-center size-[40px] rounded-[10px] bg-[#f6f6f6] border border-[#ebebeb]">
+          <Image src="/design-assets/logo-mark.svg" alt="Datasaki" width={19} height={19} />
+        </div>
         <div className="flex flex-col items-center gap-[8px] text-center">
           <div className="flex items-center gap-[8px]">
             <p className="font-medium text-[16px] text-[#2c2c2e] tracking-[-0.15px]">Datasaki Copilot</p>

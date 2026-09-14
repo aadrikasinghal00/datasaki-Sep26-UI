@@ -15,13 +15,13 @@ function nextId() {
 }
 
 function titleFromMessage(text: string) {
-  const words = text.trim().split(/\s+/).slice(0, 6).join(" ");
+  const words = text.trim().split(/\s+/).slice(0, 4).join(" ");
   return words.length < text.trim().length ? `${words}…` : words;
 }
 
-function generateAssistantReply(question: string) {
+function generateAssistantReply(question: string, forceWidget: boolean) {
   const lower = question.toLowerCase();
-  const showsWidget = lower.includes("machine") || lower.includes("oee");
+  const showsWidget = forceWidget || lower.includes("machine") || lower.includes("oee");
   const text = showsWidget
     ? "Line 3's HPLC-04 unit is the biggest drag on fleet OEE today — availability dropped after an unplanned changeover. Here's the sample throughput trend against its usual baseline instrument:"
     : "Based on the last 7 days of sensor and batch data, the biggest active risk is a stability-sample deviation trending upward on Conveyor B. I'd recommend reviewing the calibration log before the next shift change.";
@@ -57,6 +57,7 @@ export function ChatConversationView({ initialMessage }: { initialMessage?: stri
   const messageNodeRefs = useRef(new Map<string, HTMLDivElement>());
   const lastUserIdRef = useRef<string | null>(null);
   const consumedInitialRef = useRef(false);
+  const userMessageCountRef = useRef(0);
 
   useEffect(() => {
     if (consumedInitialRef.current || !initialMessage) return;
@@ -89,6 +90,8 @@ export function ChatConversationView({ initialMessage }: { initialMessage?: stri
     const assistantId = nextId();
     lastUserIdRef.current = userId;
     setTitle((prev) => (prev === "New chat" ? titleFromMessage(text) : prev));
+    userMessageCountRef.current += 1;
+    const forceWidget = userMessageCountRef.current >= 2;
 
     setMessages((prev) => [
       ...prev,
@@ -98,7 +101,7 @@ export function ChatConversationView({ initialMessage }: { initialMessage?: stri
     setStreamingId(assistantId);
 
     timeoutRef.current = setTimeout(() => {
-      const reply = generateAssistantReply(text);
+      const reply = generateAssistantReply(text, forceWidget);
       setMessages((prev) =>
         prev.map((m) =>
           m.id === assistantId

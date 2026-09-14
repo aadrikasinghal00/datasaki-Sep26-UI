@@ -4,6 +4,7 @@ import { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PlusSignIcon } from "@hugeicons/core-free-icons";
 import { DateRangeDropdown, FilterDropdown } from "./FilterDropdown";
+import { GenerateWidgetModal } from "./GenerateWidgetModal";
 
 const STROKE_WIDTH = 1.15;
 
@@ -15,6 +16,7 @@ export function FilterBar() {
   const [compare, setCompare] = useState("Off");
   const [filters, setFilters] = useState<Set<string>>(new Set());
   const [layoutSaved, setLayoutSaved] = useState(false);
+  const [widgetModalOpen, setWidgetModalOpen] = useState(false);
 
   function toggleFilter(value: string) {
     setFilters((prev) => {
@@ -44,13 +46,18 @@ export function FilterBar() {
             {layoutSaved ? "Saved ✓" : "Save Layout"}
           </span>
         </button>
-        <button className="bg-[#202020] flex gap-[4px] h-[30px] items-center justify-center px-[12px] rounded-[6px] text-white hover:bg-[#333] transition-colors duration-150">
+        <button
+          onClick={() => setWidgetModalOpen(true)}
+          className="bg-[#202020] flex gap-[4px] h-[30px] items-center justify-center px-[12px] rounded-[6px] text-white hover:bg-[#333] transition-colors duration-150"
+        >
           <HugeiconsIcon icon={PlusSignIcon} size={14} strokeWidth={STROKE_WIDTH} absoluteStrokeWidth />
           <span className="font-medium leading-none text-[14px] tracking-[-0.15px] whitespace-nowrap">
             Add Widget
           </span>
         </button>
       </div>
+
+      <GenerateWidgetModal open={widgetModalOpen} onClose={() => setWidgetModalOpen(false)} />
     </div>
   );
 }
